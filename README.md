@@ -42,19 +42,42 @@ En el chat puedes escribir `@Shakira pista`, `@Shakira ranking` o `@Shakira reto
 
 ---
 
-## 🕹️ Cómo jugar (amigos)
+## 🌐 Abrir la partida (anfitrión)
+
+Necesitas Docker Desktop abierto y `gh` con sesión iniciada. Desde la raíz del repo:
 
 ```bash
-git clone https://github.com/GorkyAnge/shakira-bugs.git
+./scripts/jugar.sh
+```
+
+El script hace esto:
+
+1. La primera vez crea un `.env` con un secreto aleatorio y lo guarda como secret `SHAKIRA_WEBHOOK_SECRET` en GitHub.
+2. Levanta la app con Docker Compose.
+3. Abre un túnel público gratis de Cloudflare (`https://algo.trycloudflare.com`).
+4. Guarda esa URL en la variable `SHAKIRA_API_URL` del repo para que GitHub Actions sepa a dónde avisarle a Shakira.
+
+Comparte la URL con tus amigos. El túnel vive mientras el script esté corriendo: con `Ctrl+C` se cierra. Si lo vuelves a abrir, la URL cambia, así que tendrás que compartir la nueva; la variable de GitHub se actualiza sola.
+
+---
+
+## 🕹️ Cómo jugar (amigos)
+
+1. Abre la URL que te pasó el anfitrión y entra con tu nombre y tu **usuario de GitHub**.
+2. Haz **fork** de https://github.com/GorkyAnge/shakira-bugs y clónalo:
+
+```bash
+git clone https://github.com/<tu-usuario>/shakira-bugs.git
 cd shakira-bugs/buggy-site
 npm run challenges        # ver qué retos pasan (no necesita npm install)
 npm start                 # ver la tienda en http://localhost:5500
 node --test tests/challenges/cart-total.test.js   # probar un solo reto
 ```
 
-1. Entra al chat con tu **usuario de GitHub** (debe ser el mismo con el que harás push o PR).
-2. Arregla el bug en `buggy-site/src/…`. No toques los tests, porque CI usa los de `main`.
-3. Abre un PR, o haz push a una rama si eres colaborador. En un par de minutos Shakira te felicita en el chat.
+3. Cuando Shakira reporte un bug, arréglalo en `buggy-site/src/…`. No toques los tests, porque CI usa los de `main`.
+4. Haz push a tu fork y abre un **Pull Request** hacia `GorkyAnge/shakira-bugs`. En un par de minutos Shakira te felicita en el chat y suma tus puntos.
+
+> La primera vez que alguien abre un PR desde un fork, GitHub pide al dueño del repo que apruebe la ejecución (**Approve and run** en el PR).
 
 ---
 
