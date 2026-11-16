@@ -1,0 +1,74 @@
+[
+  {
+    "id": "cart-total",
+    "title": "El total del carrito está mal",
+    "difficulty": "EASY",
+    "file": "buggy-site/src/cart.js",
+    "alert": "🚨 ¡Equipo! Un cliente compró 3 guitarras y le cobramos UNA. El total del carrito ignora las cantidades. Mis caderas no mienten y este total tampoco debería 💃",
+    "hint": "Revisa el reduce: ¿dónde está la cantidad? Y ojo con 0.1 + 0.2."
+  },
+  {
+    "id": "email-validation",
+    "title": "La newsletter rechaza correos válidos",
+    "difficulty": "EASY",
+    "file": "buggy-site/src/validation.js",
+    "alert": "📧 Me escribieron fans furiosas: 'Ana.Perez+tienda@mail.co' no se puede suscribir, pero 'ana@correo' sí 🙄. Arreglen esa validación de email.",
+    "hint": "Mayúsculas, puntos, + y un dominio con TLD. Y que la regex llegue hasta el final ($)."
+  },
+  {
+    "id": "price-format",
+    "title": "Precios que se ven feos",
+    "difficulty": "EASY",
+    "file": "buggy-site/src/format.js",
+    "alert": "💸 ¿Por qué la pandereta cuesta \"$19.50\" en un lado y \"$19.5\" en otro? Quiero precios con 2 decimales y separador de miles. Elegancia, por favor.",
+    "hint": "toLocaleString con minimumFractionDigits… y los precios pueden llegar como string."
+  },
+  {
+    "id": "search-case",
+    "title": "El buscador es muy quisquilloso",
+    "difficulty": "MEDIUM",
+    "file": "buggy-site/src/search.js",
+    "alert": "🔍 Busqué 'guitarra' y no salió nada. Busqué 'acustica' y tampoco. ¡Los clientes no escriben con mayúsculas ni tildes, mi amor! Arreglen el buscador.",
+    "hint": "toLowerCase, trim y String.prototype.normalize('NFD') para las tildes."
+  },
+  {
+    "id": "pagination",
+    "title": "La paginación repite productos",
+    "difficulty": "MEDIUM",
+    "file": "buggy-site/src/pagination.js",
+    "alert": "📄 En la página 2 aparece otra vez el último producto de la página 1, y la última página ni existe. Esto está más desordenado que mi camerino.",
+    "hint": "Off-by-one en el slice, Math.floor vs Math.ceil y páginas fuera de rango."
+  },
+  {
+    "id": "discount-code",
+    "title": "SHAKIRA20 está regalando dinero",
+    "difficulty": "MEDIUM",
+    "file": "buggy-site/src/discount.js",
+    "alert": "🏷️ El código SHAKIRA20 debería ser 20% de descuento, ¡no 20 dólares! Y con BIENVENIDA5 alguien quedó con total negativo. Contabilidad me va a matar.",
+    "hint": "Distingue 'percent' y 'fixed', no bajes de 0, redondea a 2 decimales y normaliza el código."
+  },
+  {
+    "id": "xss-reviews",
+    "title": "Hackearon las reseñas (XSS)",
+    "difficulty": "HARD",
+    "file": "buggy-site/src/reviews.js",
+    "alert": "🛑 ALERTA ROJA: alguien dejó una reseña con un <img onerror> y se ejecutó código en la tienda. Además salen 9 estrellas. Esto es seguridad, lo quiero YA.",
+    "hint": "Escapa & < > \" ' antes de interpolar. Limita el rating entre 1 y 5 y rellena con ☆."
+  },
+  {
+    "id": "sort-price",
+    "title": "Ordenar por precio no ordena",
+    "difficulty": "HARD",
+    "file": "buggy-site/src/sort.js",
+    "alert": "📉 Ordené de menor a mayor y el tambor de $100 salió antes que las maracas de $15. ¿Estamos ordenando como texto? Y encima me desordena el catálogo original.",
+    "hint": "Convierte a número, no mutes el array (copia antes) y devuelve 0 en empates para que sea estable."
+  },
+  {
+    "id": "shipping-days",
+    "title": "Fechas de entrega imposibles",
+    "difficulty": "HARD",
+    "file": "buggy-site/src/shipping.js",
+    "alert": "📦 Prometimos entregar un DOMINGO. Los envíos solo cuentan días hábiles, y si el pedido entra después de las 14:00 (UTC) empieza a contar al día siguiente. Arréglenlo antes de que me llamen de logística.",
+    "hint": "Usa los métodos getUTC*/setUTC*, salta sábados y domingos, y no mutes la fecha recibida."
+  }
+]

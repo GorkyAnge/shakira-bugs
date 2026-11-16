@@ -1,0 +1,30 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application.name: shakira-bugs
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/shakira;AUTO_SERVER=TRUE}
+    username: sa
+    password: ""
+  jpa:
+    hibernate.ddl-auto: update
+    open-in-view: false
+  jackson:
+    serialization.write-dates-as-timestamps: false
+
+management:
+  endpoints.web.exposure.include: health
+
+shakira:
+  # Secreto compartido con GitHub Actions (secret SHAKIRA_WEBHOOK_SECRET)
+  webhook-secret: ${SHAKIRA_WEBHOOK_SECRET:cambia-este-secreto}
+  # Cada cuánto (aleatorio entre min y max) Shakira manda una alerta
+  min-delay-seconds: ${SHAKIRA_MIN_DELAY:60}
+  max-delay-seconds: ${SHAKIRA_MAX_DELAY:300}
+  # Cuántos retos abiertos (anunciados y sin resolver) puede haber a la vez
+  max-open-challenges: ${SHAKIRA_MAX_OPEN:3}
+  auto-announce: ${SHAKIRA_AUTO_ANNOUNCE:true}
+  # URL del repositorio para enlazar archivos en los mensajes
+  repo-url: ${SHAKIRA_REPO_URL:https://github.com/GorkyAnge/shakira-bugs}
+  allowed-origins: ${SHAKIRA_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}

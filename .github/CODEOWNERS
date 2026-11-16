@@ -1,0 +1,6 @@
+# Activa "Require review from Code Owners" en la protección de la rama main:
+# así nadie "arregla" un reto cambiando los tests o el workflow.
+/buggy-site/tests/    @GorkyAnge
+/buggy-site/scripts/  @GorkyAnge
+/.github/             @GorkyAnge
+/backend/             @GorkyAnge

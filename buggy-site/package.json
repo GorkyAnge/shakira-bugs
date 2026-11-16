@@ -1,0 +1,13 @@
+{
+  "name": "tienda-la-loba",
+  "version": "1.0.0",
+  "private": true,
+  "description": "La tienda online llena de bugs que Shakira quiere que arregles.",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "challenges": "node scripts/run-challenges.mjs",
+    "test": "node --test tests/challenges/"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,25 @@
+services:
+  backend:
+    build: ./backend
+    image: shakira-bugs-backend
+    environment:
+      SHAKIRA_WEBHOOK_SECRET: ${SHAKIRA_WEBHOOK_SECRET:-cambia-este-secreto}
+      SHAKIRA_MIN_DELAY: ${SHAKIRA_MIN_DELAY:-60}
+      SHAKIRA_MAX_DELAY: ${SHAKIRA_MAX_DELAY:-300}
+      SHAKIRA_REPO_URL: ${SHAKIRA_REPO_URL:-https://github.com/GorkyAnge/shakira-bugs}
+      SHAKIRA_ALLOWED_ORIGINS: ${SHAKIRA_ALLOWED_ORIGINS:-http://localhost:3000}
+      DB_URL: jdbc:h2:file:/app/data/shakira
+    volumes:
+      - shakira-data:/app/data
+    ports:
+      - "8080:8080"   # expuesto para que GitHub Actions (vía túnel) llegue a /api/ci/results
+
+  frontend:
+    build: ./frontend
+    image: shakira-bugs-frontend
+    depends_on: [backend]
+    ports:
+      - "3000:80"
+
+volumes:
+  shakira-data:

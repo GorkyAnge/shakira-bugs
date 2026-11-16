@@ -1,0 +1,96 @@
+# Evalúa los retos de cada push/PR y le avisa a Shakira (el backend) quién resolvió qué.
+#
+# Seguridad: se ejecuta con `workflow_run`, así que el workflow y los tests SIEMPRE vienen de la
+# rama por defecto (no se pueden falsear desde un PR). Del commit del contribuidor solo se toma
+# `buggy-site/src`. El job que ejecuta ese código no tiene acceso al secreto; el job que llama
+# al backend no ejecuta código del contribuidor.
+name: Shakira · Evaluar retos
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    name: Ejecutar retos contra el commit
+    if: github.event.workflow_run.conclusion != 'cancelled' && github.event.workflow_run.conclusion != 'skipped'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout de la rama por defecto (tests y runner confiables)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout del commit evaluado
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.workflow_run.head_repository.full_name }}
+          ref: ${{ github.event.workflow_run.head_sha }}
+          path: contributor
+          persist-credentials: false
+
+      - name: Usar solo buggy-site/src del contribuidor
+        run: |
+          rm -rf buggy-site/src
+          cp -R contributor/buggy-site/src buggy-site/src
+          rm -rf contributor
+
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Ejecutar retos
+        working-directory: buggy-site
+        run: node scripts/run-challenges.mjs "$RUNNER_TEMP/results.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: challenge-results
+          path: ${{ runner.temp }}/results.json
+          retention-days: 3
+
+  report:
+    name: Avisar a Shakira
+    needs: evaluate
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: challenge-results
+
+      - name: Enviar resultados al backend
+        env:
+          SHAKIRA_API_URL: ${{ vars.SHAKIRA_API_URL }}
+          SHAKIRA_WEBHOOK_SECRET: ${{ secrets.SHAKIRA_WEBHOOK_SECRET }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+          EVENT: ${{ github.event.workflow_run.event }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+        run: |
+          if [ -z "$SHAKIRA_API_URL" ] || [ -z "$SHAKIRA_WEBHOOK_SECRET" ]; then
+            echo "::warning::Configura la variable SHAKIRA_API_URL y el secret SHAKIRA_WEBHOOK_SECRET para que Shakira se entere."
+            exit 0
+          fi
+          # Validar forma del artefacto antes de enviarlo
+          jq -e '[.passed, .failed] | all(type == "array" and all(type == "string" and test("^[a-z0-9-]{1,60}$")))' results.json > /dev/null
+
+          jq -n --slurpfile r results.json \
+            --arg user "$ACTOR" --arg event "$EVENT" --arg branch "$BRANCH" \
+            --arg sha "$SHA" --arg url "$RUN_URL" --arg pr "$PR_NUMBER" \
+            '{githubUser: $user, event: $event, branch: $branch, sha: $sha, runUrl: $url,
+              prNumber: (if $pr == "" then null else ($pr | tonumber) end),
+              passed: $r[0].passed, failed: $r[0].failed}' > payload.json
+          cat payload.json
+
+          curl -fsS --retry 3 --retry-all-errors -X POST "${SHAKIRA_API_URL%/}/api/ci/results" \
+            -H "Content-Type: application/json" \
+            -H "X-Shakira-Secret: $SHAKIRA_WEBHOOK_SECRET" \
+            --data @payload.json | tee response.json
+          echo
+          jq -r '"### 💃 Shakira dice\n\n@\(.githubUser): +\(.pointsAwarded) pts (total \(.totalPoints)). Nuevos resueltos: \(.newlySolved | join(", ") | if . == "" then "ninguno" else . end)"' response.json >> "$GITHUB_STEP_SUMMARY"

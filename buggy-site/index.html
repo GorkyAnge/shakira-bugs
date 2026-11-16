@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tienda La Loba</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🐺 Tienda La Loba</h1>
+    <input id="search" type="search" placeholder="Buscar productos…" />
+    <select id="sort">
+      <option value="asc">Precio: menor a mayor</option>
+      <option value="desc">Precio: mayor a menor</option>
+    </select>
+  </header>
+  <main>
+    <section>
+      <div id="products" class="grid"></div>
+      <nav id="pager"></nav>
+    </section>
+    <aside>
+      <h2>Carrito</h2>
+      <ul id="cart"></ul>
+      <input id="code" placeholder="Código de descuento (SHAKIRA20)" />
+      <p>Total: <strong id="total">$0.00</strong></p>
+      <p class="muted">Entrega estimada (3 días hábiles): <span id="eta"></span></p>
+      <h2>Newsletter</h2>
+      <form id="newsletter"><input id="email" placeholder="tu@correo.com" /><button>Suscribirme</button></form>
+      <p id="email-msg" class="muted"></p>
+      <h2>Reseñas</h2>
+      <div id="reviews"></div>
+    </aside>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

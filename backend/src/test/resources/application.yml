@@ -1,0 +1,11 @@
+spring:
+  datasource.url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1
+  jpa.hibernate.ddl-auto: create-drop
+shakira:
+  webhook-secret: test-secret
+  auto-announce: false
+  min-delay-seconds: 1
+  max-delay-seconds: 2
+  max-open-challenges: 3
+  repo-url: https://github.com/test/repo
+  allowed-origins: http://localhost:5173

@@ -1,0 +1,64 @@
+# CI: compila y prueba todo en cada push y PR.
+# Al terminar, dispara "Shakira · Evaluar retos" (challenge-report.yml).
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Spring Boot)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: mvn -B verify
+
+  frontend:
+    name: Frontend (React)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  challenges:
+    name: Retos de Shakira (informativo)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: buggy-site } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Ejecutar retos
+        run: node scripts/run-challenges.mjs results.json
+      - name: Resumen
+        run: |
+          {
+            echo "## 💃 Retos de Shakira"
+            echo ""
+            echo "| Reto | Estado |"
+            echo "|---|---|"
+            jq -r '.passed[] | "| `\(.)` | ✅ resuelto |"' results.json
+            jq -r '.failed[] | "| `\(.)` | ❌ pendiente |"' results.json
+          } >> "$GITHUB_STEP_SUMMARY"
