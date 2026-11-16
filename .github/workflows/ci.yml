@@ -4,6 +4,7 @@ name: CI
 
 on:
   push:
+    branches: ['**']   # no correr CI al subir etiquetas
   pull_request:
   workflow_dispatch:
 
